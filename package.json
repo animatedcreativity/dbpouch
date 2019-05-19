@@ -1,0 +1,31 @@
+{
+  "name": "dbpouch",
+  "version": "0.0.3",
+  "description": "Fastest and easiest database in cloud, based on PouchDb & node-pouch. Work with multiple cloud databases like a PRO.",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "node-sanitize-options": "^0.0.6",
+    "request": "^2.88.0"
+  },
+  "engines": {
+    "node": "8.x"
+  },
+  "repository": {
+    "url": "https://github.com/animatedcreativity/dbpouch"
+  },
+  "license": "MIT",
+  "keywords": [
+    "node",
+    "dbpouch",
+    "pouch",
+    "pouchdb",
+    "database",
+    "cloud",
+    "hosted",
+    "pouchdb-server",
+    "couchdb"
+  ]
+}
