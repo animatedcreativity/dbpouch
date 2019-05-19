@@ -20,9 +20,13 @@ exports = module.exports = function(config) {
           request.post({url: config.link + "/db/" + type, formData: {apiKey: config.apiKey, database: database, query: query}}, function(error, response, body) {
             try {
               var data = JSON.parse(body);
-              resolve(data);
+              if (typeof data.reason === "undefined" && typeof data.error === "undefined") {
+                resolve(data);
+              } else {
+                reject(data);
+              }
             } catch (error) {
-              resolve(body);
+              reject({status: app.status.loadError, error: body});
             }
           });
         });
