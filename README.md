@@ -1,19 +1,21 @@
 # dbpouch
 
-Fastest and easiest database in cloud, based on PouchDb & node-pouch. Work with multiple cloud databases like a PRO.  
-Uses node-pouch module to get/save data from/to dbpouch.com servers.
-
+Fastest and easiest database in cloud, hosted on CDN. Work with multiple cloud databases like a PRO.  
 To generate access code and get API key, please read instructions on the website: [https://dbpouch.com/](https://dbpouch.com/)
 
 ### **Usage:**
 ```
 var dbpouch = require("dbpouch");
-var dbpouch = new exports({
-  link: "https://n1.dbpouch.com",
-  apiKey: "<your_api_key_here>",
-  database: "test"
+var db = new dbpouch({
+  database: "<test>",
+  cdn: {
+    email: "<email>",
+    apiKey: "<apiKey>",
+    domain: "<domain/space>",
+    folder: "<folder>"
+  }
 });
-dbpouch.save({name: "Apple", type: "fruit"}).then(function(data) {
+db.save({name: "Apple", type: "fruit"}).then(function(data) {
   console.log(data);
 }).catch(function(error) {
   console.log(error);

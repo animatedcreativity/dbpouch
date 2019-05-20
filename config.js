@@ -1,7 +1,14 @@
 exports = module.exports = function() {
-  return { // dbpouch.com details: https://dbpouch.com/
-    link: "<remote_link>",
-    apiKey: "<api_key>",
-    database: "<test>"
+  return {
+    database: "<test>",
+    checkTime: 0.1, // seconds
+    saveTime: 2, // seconds
+    cacheTime: 30, // seconds
+    cdn: {
+      email: "<email>",
+      apiKey: "<apiKey>",
+      domain: "<domain/space>",
+      folder: "<folder>"
+    }
   };
 };
