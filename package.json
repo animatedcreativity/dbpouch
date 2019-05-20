@@ -1,6 +1,6 @@
 {
   "name": "dbpouch",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Fastest and easiest database in cloud, based on PouchDb & node-pouch. Work with multiple cloud databases like a PRO.",
   "main": "main.js",
   "scripts": {

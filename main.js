@@ -100,7 +100,7 @@ exports = module.exports = function(config) {
         app.timeouts[database] = setTimeout(function() {
           app.db.save(database);
         }, config.saveTime * 1000);
-        resolve({status: app.status.success, message: "Done."});
+        resolve({status: app.status.success, message: "Done.", _id: object._id});
       });
     },
     record: function(query, database) {
