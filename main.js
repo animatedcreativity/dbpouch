@@ -94,13 +94,18 @@ exports = module.exports = function(config) {
         if (typeof object._id === "undefined") object._id = app.db.id();
         if (typeof object._rev === "undefined") object._rev = app.db.id(); // just to support pouchdb
         var {db} = await app.wrapper("db", app.db.load(database));
-        db.data[object._id] = object;
+        var saved = {};
+        if (typeof db.data[object._id] !== "undefined") saved = db.data[object._id];
+        for (var key in object) {
+          saved[key] = object[key];
+        }
+        db.data[object._id] = saved;
         db.changed = true;
         if (typeof app.timeouts[database] !== "undefined") clearTimeout(app.timeouts[database]);
         app.timeouts[database] = setTimeout(function() {
           app.db.save(database);
         }, config.saveTime * 1000);
-        resolve({status: app.status.success, message: "Done.", _id: object._id, id: object._id});
+        resolve({status: app.status.success, message: "Done.", _id: saved._id, id: saved._id});
       });
     },
     record: function(query, database) {
