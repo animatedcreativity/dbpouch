@@ -30,13 +30,17 @@ db.save({name: "Apple", type: "fruit"}).then(function(data) {
 
 - `data`: Should be an object. Record ID should be specified as `_id`.  
 Example: `.save({_id: "apple", name: "Apple", type: "fruit"});`.  
-Set `_deleted: true` if you want to delete the record.
+- `database`: Optional if already provided when creating a new instance of the module. Useful if you want to use a different database name.
 
+`.delete(id, database);`
+
+- `id`: Delete a record using its `id`.
+Example: `.delete("apple");`.  
 - `database`: Optional if already provided when creating a new instance of the module. Useful if you want to use a different database name.
 
 `.get(id, database);`
 
-- `data`: Fetch a record using its `id`.
+- `id`: Fetch a record using its `id`.
 Example: `.get("apple");`.
 - `database`: Optional if already provided when creating a new instance of the module. Useful if you want to use a different database name.
 

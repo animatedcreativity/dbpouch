@@ -108,6 +108,24 @@ exports = module.exports = function(config) {
         resolve({status: app.status.success, message: "Done.", _id: saved._id, id: saved._id});
       });
     },
+    delete: function(id, database) {
+      return new Promise(async function(resolve, reject) {
+        if (typeof id === "undefined") id = "";
+        if (typeof database === "undefined") database = config.database;
+        if (typeof database === "undefined" || database.trim() === "") {
+          reject({status: app.status.databaseError, error: "Database error."});
+          return false;
+        }
+        var {db} = await app.wrapper("db", app.db.load(database));
+        if (typeof db.data[id] !== "undefined") delete db.data[id];
+        db.changed = true;
+        if (typeof app.timeouts[database] !== "undefined") clearTimeout(app.timeouts[database]);
+        app.timeouts[database] = setTimeout(function() {
+          app.db.save(database);
+        }, config.saveTime * 1000);
+        resolve({status: app.status.success, message: "Done."});
+      });
+    },
     record: function(query, database) {
       return new Promise(async function(resolve, reject) {
         if (typeof database === "undefined") database = config.database;
