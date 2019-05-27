@@ -46,15 +46,6 @@ exports = module.exports = function(config) {
           }
         });
       },
-      save: async function(database) { // ToDo: make it add to queue later. Important because may loose data until done.
-        var {db} = await app.wrapper("db", app.db.load(database));
-        if (db.changed === true) {
-          delete db.changed;
-          var file = config.cdn.folder + "/" + database + ".json";
-          var {error, result} = await app.wrapper("result", cdnfly.writeFile(config.cdn, file, JSON.stringify(db), "application/json"));
-          if (typeof error !== "undefined") console.log("dbpouch >>", error);
-        }
-      },
       clear: function() {
         for (var database in app.db.list) {
           var db = app.db.list[database];
@@ -100,12 +91,15 @@ exports = module.exports = function(config) {
           saved[key] = object[key];
         }
         db.data[object._id] = saved;
-        db.changed = true;
-        if (typeof app.timeouts[database] !== "undefined") clearTimeout(app.timeouts[database]);
-        app.timeouts[database] = setTimeout(function() {
-          app.db.save(database);
-        }, config.saveTime * 1000);
-        resolve({status: app.status.success, message: "Done.", _id: saved._id, id: saved._id});
+        var updateJson = {};
+        updateJson[saved._id] = saved;
+        var file = config.cdn.folder + "/" + database + ".json";
+        var {error, result} = cdnfly.json.put(config.cdn, file, updateJson);
+        if (typeof result !== "undefined") {
+          resolve({status: app.status.success, message: "Done.", _id: saved._id, id: saved._id});
+        } else {
+          reject(error);
+        }
       });
     },
     delete: function(id, database) {
@@ -118,12 +112,15 @@ exports = module.exports = function(config) {
         }
         var {db} = await app.wrapper("db", app.db.load(database));
         if (typeof db.data[id] !== "undefined") delete db.data[id];
-        db.changed = true;
-        if (typeof app.timeouts[database] !== "undefined") clearTimeout(app.timeouts[database]);
-        app.timeouts[database] = setTimeout(function() {
-          app.db.save(database);
-        }, config.saveTime * 1000);
-        resolve({status: app.status.success, message: "Done."});
+        var updateJson = {};
+        updateJson[id] = {};
+        var file = config.cdn.folder + "/" + database + ".json";
+        var {error, result} = cdnfly.json.delete(config.cdn, file, updateJson);
+        if (typeof result !== "undefined") {
+          resolve(result);
+        } else {
+          reject(error);
+        }
       });
     },
     record: function(query, database) {
