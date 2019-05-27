@@ -94,7 +94,7 @@ exports = module.exports = function(config) {
         var updateJson = {};
         updateJson[saved._id] = saved;
         var file = config.cdn.folder + "/" + database + ".json";
-        var {error, result} = cdnfly.json.put(config.cdn, file, updateJson);
+        var {error, result} = await app.wrapper("result", cdnfly.json.put(config.cdn, file, updateJson));
         if (typeof result !== "undefined") {
           resolve({status: app.status.success, message: "Done.", _id: saved._id, id: saved._id});
         } else {
@@ -115,7 +115,7 @@ exports = module.exports = function(config) {
         var updateJson = {};
         updateJson[id] = {};
         var file = config.cdn.folder + "/" + database + ".json";
-        var {error, result} = cdnfly.json.delete(config.cdn, file, updateJson);
+        var {error, result} = await app.wrapper("result", cdnfly.json.delete(config.cdn, file, updateJson));
         if (typeof result !== "undefined") {
           resolve(result);
         } else {
