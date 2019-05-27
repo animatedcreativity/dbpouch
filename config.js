@@ -1,7 +1,7 @@
 exports = module.exports = function() {
   return {
     offline: {
-      use: true,
+      use: false,
       folder: "<folder>"
     },
     database: "<test>",
