@@ -38,10 +38,10 @@ exports = module.exports = function(config) {
                 if (config.offline.use === true) fs.writeFileSync(offlineFile, JSON.stringify(json), "utf8");
               }
               if (typeof json.data === "undefined") json.data = {};
-              json.loadTime = Date.now();
               app.db.list[database] = json;
               app.db.loading[database] = false;
             }
+            json.loadTime = Date.now();
             resolve(app.db.list[database]);
           } else {
             var interval = setInterval(function() {
