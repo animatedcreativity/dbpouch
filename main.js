@@ -41,7 +41,7 @@ exports = module.exports = function(config) {
               app.db.list[database] = json;
               app.db.loading[database] = false;
             }
-            json.loadTime = Date.now();
+            if (typeof app.db.list[database] !== "undefined") app.db.list[database].loadTime = Date.now();
             resolve(app.db.list[database]);
           } else {
             var interval = setInterval(function() {
