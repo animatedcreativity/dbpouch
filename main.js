@@ -8,7 +8,9 @@ exports = module.exports = function(config) {
   var app = {
     status: require("./status.js")(),
     wrapper: require("node-promise-wrapper"),
-    timeouts: {},
+    timeout: {},
+    saved: [],
+    deleted: [],
     db: {
       loading: {},
       id: function() {
@@ -98,21 +100,27 @@ exports = module.exports = function(config) {
           saved[key] = object[key];
         }
         db.data[object._id] = saved;
-        if (config.offline.use === true) {
-          var file = config.offline.folder + "/" + database + ".json";
-          fs.writeFileSync(file, JSON.stringify(db), "utf8");
-          resolve({status: app.status.success, message: "Done.", _id: saved._id, id: saved._id});
-        } else {
-          var updateJson = {};
-          updateJson[saved._id] = saved;
-          var file = config.cdn.folder + "/" + database + ".json";
-          var {error, result} = await app.wrapper("result", cdnfly.json.put(config.cdn, file, updateJson));
-          if (typeof result !== "undefined") {
-            resolve({status: app.status.success, message: "Done.", _id: saved._id, id: saved._id});
+        app.saved.push(object._id);
+        if (app.timeout.save !== "undefined") clearTimeout(app.timeout.save);
+        app.timeout.save = setTimeout(async function() {
+          if (config.offline.use === true) {
+            var file = config.offline.folder + "/" + database + ".json";
+            fs.writeFileSync(file, JSON.stringify(db), "utf8");
           } else {
-            reject(error);
+            var updateJson = {};
+            for (var i=0; i<=app.saved.length-1; i++) {
+              if (typeof db.data[app.saved[i]] !== "undefined") updateJson[app.saved[i]] = db.data[app.saved[i]];
+            }
+            var file = config.cdn.folder + "/" + database + ".json";
+            var {error, result} = await app.wrapper("result", cdnfly.json.put(config.cdn, file, updateJson));
+            if (typeof result !== "undefined") {
+              // do nothing
+            } else {
+              reject(error);
+            }
           }
-        }
+        }, config.saveTime * 1000);
+        resolve({status: app.status.success, message: "Done.", _id: saved._id, id: saved._id});
       });
     },
     delete: function(id, database) {
@@ -125,21 +133,27 @@ exports = module.exports = function(config) {
         }
         var {db} = await app.wrapper("db", app.db.load(database));
         if (typeof db.data[id] !== "undefined") delete db.data[id];
-        if (config.offline.use === true) {
-          var file = config.offline.folder + "/" + database + ".json";
-          fs.writeFileSync(file, JSON.stringify(db), "utf8");
-          resolve({status: app.status.success, message: "Done."});
-        } else {
-          var updateJson = {};
-          updateJson[id] = {};
-          var file = config.cdn.folder + "/" + database + ".json";
-          var {error, result} = await app.wrapper("result", cdnfly.json.delete(config.cdn, file, updateJson));
-          if (typeof result !== "undefined") {
-            resolve(result);
+        app.deleted.push(id);
+        if (app.timeout.delete !== "undefined") clearTimeout(app.timeout.delete);
+        app.timeout.delete = setTimeout(async function() {
+          if (config.offline.use === true) {
+            var file = config.offline.folder + "/" + database + ".json";
+            fs.writeFileSync(file, JSON.stringify(db), "utf8");
           } else {
-            reject(error);
+            var updateJson = {};
+            for (var i=0; i<=app.deleted.length-1; i++) {
+              updateJson[app.deleted[i]] = {};
+            }
+            var file = config.cdn.folder + "/" + database + ".json";
+            var {error, result} = await app.wrapper("result", cdnfly.json.delete(config.cdn, file, updateJson));
+            if (typeof result !== "undefined") {
+              // do nothing
+            } else {
+              reject(error);
+            }
           }
-        }
+        }, app.deleteTime * 1000);
+        resolve({status: app.status.success, message: "Done."});
       });
     },
     record: function(query, database) {
