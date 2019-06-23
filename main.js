@@ -8,7 +8,7 @@ exports = module.exports = function(config) {
   var app = {
     status: require("./status.js")(),
     wrapper: require("node-promise-wrapper"),
-    timeout: {},
+    timeout: {save: {}, delete: {}},
     saved: [],
     deleted: [],
     db: {
@@ -101,8 +101,8 @@ exports = module.exports = function(config) {
         }
         db.data[object._id] = saved;
         app.saved.push(object._id);
-        if (app.timeout.save !== "undefined") clearTimeout(app.timeout.save);
-        app.timeout.save = setTimeout(async function() {
+        if (app.timeout.save[database] !== "undefined") clearTimeout(app.timeout.save[database]);
+        app.timeout.save[database] = setTimeout(async function() {
           if (config.offline.use === true) {
             var file = config.offline.folder + "/" + database + ".json";
             fs.writeFileSync(file, JSON.stringify(db), "utf8");
@@ -134,8 +134,8 @@ exports = module.exports = function(config) {
         var {db} = await app.wrapper("db", app.db.load(database));
         if (typeof db.data[id] !== "undefined") delete db.data[id];
         app.deleted.push(id);
-        if (app.timeout.delete !== "undefined") clearTimeout(app.timeout.delete);
-        app.timeout.delete = setTimeout(async function() {
+        if (app.timeout.delete[database] !== "undefined") clearTimeout(app.timeout.delete[database]);
+        app.timeout.delete[database] = setTimeout(async function() {
           if (config.offline.use === true) {
             var file = config.offline.folder + "/" + database + ".json";
             fs.writeFileSync(file, JSON.stringify(db), "utf8");
